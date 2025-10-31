@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stratos Vario Config - Demonstração v21.9</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body{font-family:Arial,sans-serif;text-align:center;margin:20px;background-color:#f4f4f4;} 
+        .container{max-width:400px;margin:auto;padding:20px;border:1px solid #ccc;border-radius:8px;background-color:#fff;}
+        h1{color:#333} 
+        label{display:block;margin:15px 0 5px;font-weight:700} 
+        input[type=number],input[type=range],select{width:100%;padding:8px;box-sizing:border-box}
+        button{padding:10px 20px;font-size:16px;cursor:pointer;background-color:#007BFF;color:#fff;border:none;border-radius:5px;margin-top:10px}
+        .info{font-size:12px;color:#666;text-align:center; margin: 2px 0 10px 0;} 
+        a{color:#007BFF;text-decoration:none;}
+        fieldset{border:1px solid #ddd; padding:15px; margin-bottom:20px; border-radius: 8px;} 
+        legend{font-weight:bold; color:#007BFF;}
+        .radio-group label{display:inline-block; margin-right: 15px; font-weight:normal;} 
+        .radio-group input{width:auto;}
+        input:disabled, select:disabled { background-color: #eee; color: #777; cursor: not-allowed; } 
+        label.disabled { color: #999; }
+        a.disabled { color: #999; cursor: not-allowed; text-decoration: none; pointer-events: none; opacity: 0.6;}
+        #manualSliderContainer.disabled { opacity: 0.5; }
+
+        /* AJUSTE CSS StratosSense AI */
+        .ia-active-label {
+            background-color: #dc3545; 
+            color: #FFFFFF;			 
+            font-weight: bold;
+            padding: 4px 8px;			 
+            border-radius: 5px;		 	
+            font-size: 1.15em;			
+            display: inline-block;
+            border: 1px solid #b02a37; 
+        }
+    </style>
+    <script>
+        function updateSliderValue(sliderId, spanId) {
+          var slider = document.getElementById(sliderId);
+          var output = document.getElementById(spanId);
+          if (slider && output) { 
+            output.textContent = slider.value;
+          }
+        }
+
+        function updateUI() {
+            var audioProfile = document.getElementById('audioProfileSelect').value;
+            var filtroIA = document.getElementById('filtroIA') ? document.getElementById('filtroIA').checked : false;
+            var climbStartInput = document.getElementById('climbStartVarioInput');
+            var audioStudioLink = document.getElementById('audioStudioLink');
+            var manualSliderContainer = document.getElementById('manualSliderContainer');
+            var manualSlider = document.getElementById('filtroManualLevel');
+            var manualLabel = document.getElementById('manualLabel');
+            var manualValueSpan = document.getElementById('manualLevelValue'); 
+            var infoP = document.querySelector('#manualSliderContainer .info'); 
+
+            if (climbStartInput && audioStudioLink) {
+                if (audioProfile === '0') { 
+                    climbStartInput.disabled = false;
+                    audioStudioLink.classList.remove('disabled');
+                } else { 
+                    climbStartInput.disabled = true;
+                    audioStudioLink.classList.add('disabled');
+                }
+            }
+
+            if (manualSliderContainer && manualSlider && manualLabel && manualValueSpan && infoP) { 
+                if (filtroIA) {
+                    manualSliderContainer.classList.remove('disabled'); 
+                    manualSlider.disabled = true;
+                    manualSlider.style.display = 'none'; 
+                    infoP.style.display = 'none'; 
+                    
+                    manualLabel.textContent = 'Controlado por StratosSense AI';
+                    manualLabel.classList.remove('disabled');
+                    manualLabel.classList.add('ia-active-label');
+                    manualValueSpan.style.display = 'none'; 
+                } else {
+                    manualSliderContainer.classList.remove('disabled');
+                    manualSlider.disabled = false;
+                    manualSlider.style.display = 'block'; 
+                    infoP.style.display = 'block'; 
+
+                    manualLabel.textContent = 'Nível Manual (0-10)'; 
+                    manualLabel.classList.remove('disabled');
+                    manualLabel.classList.remove('ia-active-label');
+                    manualValueSpan.style.display = 'inline-block'; 
+                    updateSliderValue('filtroManualLevel', 'manualLevelValue');
+                }
+            }
+        }
+
+        window.addEventListener('load', updateUI);
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Configurações do Vário</h1>
+    <p style="margin: 20px 0;">
+        <a id="audioStudioLink" href="estudio_som.html" style="font-weight:bold; font-size:1.1em;">Acessar Estúdio de Som</a>
+    </p>
+    <p style="margin: -10px 0 10px 0; font-size: 0.9em;"><a href="ativar.html" style="color:#dc3545;">(Simular Bloqueio e Ativação)</a></p>
+
+    <form action="/save" method="POST">
+        
+        <fieldset>
+            <legend>Perfis de Áudio</legend>
+            <label>Perfil de Áudio do Buzzer</label>
+            <select name="audioProfile" id="audioProfileSelect" onchange="updateUI()">
+                <option value="0" selected>Stratos Dinâmico (Editável)</option>
+                <option value="1">Clássico Suave (Fixo)</option>
+                <option value="2">Modo Iniciante (Fixo)</option>
+            </select>
+        </fieldset>
+
+        <fieldset>
+            <legend>Filtro do Buzzer (Caminho 2)</legend>
+            <div class="radio-group" onchange="updateUI()">
+                <label><input type="radio" name="filtroTipo" id="filtroManual" value="manual"> Manual</label>
+                <label><input type="radio" name="filtroTipo" id="filtroIA" value="ia" checked> Filtro IA</label>
+            </div>
+            
+            <div id="manualSliderContainer" style="margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <label id="manualLabel" for="filtroManualLevel" style="margin-bottom: 0; display: inline-block;">Nível Manual (0-10)</label>
+                    <span id="manualLevelValue" style="font-weight: bold; font-family: monospace; font-size: 1.2em;">5</span>
+                </div>
+                <input type="range" name="filtroManualLevel" id="filtroManualLevel" min="0" max="10" step="1" value="5" oninput="updateSliderValue('filtroManualLevel', 'manualLevelValue')">
+                <p class="info" style="font-size:11px;">0 = Rápido | 10 = Lento</p>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Gatilhos do Buzzer</legend>
+            <label for="climbStartVarioInput">Início da Subida (m/s)</label>
+            <input type="number" name="climbStartVario" id="climbStartVarioInput" min="0.1" max="2.0" step="0.1" value="0.1"><br>
+            <p class="info" style="font-size:11px;">(Editável apenas no perfil Stratos Dinâmico)</p>
+            <label>Início da Descida (m/s)</label>
+            <input type="number" name="descendStartVario" min="-3.0" max="-0.1" step="0.1" value="-1.5"><br>
+            <label>Descida Forte (m/s)</label>
+            <input type="number" name="descendStaticVario" min="-5.0" max="-3.0" step="0.1" value="-3.5"><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Sistema</legend>
+            <label>Taxa de Transmissão Bluetooth (Hz)</label>
+            <select name="bluetoothRate">
+                <option value="10">10Hz</option>
+                <option value="20">20Hz</option>
+                <option value="30" selected>30Hz</option>
+                <option value="40">40Hz</option>
+            </select>
+            
+            <div style="text-align:left; margin-top: 15px;">
+                <input type="checkbox" name="muteOnBle" id="muteOnBle" value="on" checked>
+                <label for="muteOnBle" style="display:inline-block; font-weight:normal;">Silenciar bipes ao conectar via Bluetooth</label>
+                <p class="info" style="text-align:left; margin-top:0;">Se desmarcado, o vário continua apitando mesmo com um app (ex: XCTrack) conectado.</p>
+            </div>
+            
+            <p class="info" style="text-align:left; margin-top:15px;">Tensão da Bateria: 4.05V (75%)</p>
+        </fieldset>
+
+        <button type="submit">Aplicar e Salvar</button>
+    </form>
+
+    <form action="/reset" method="POST">
+        <button style="background-color:#dc3545" type="submit">Resetar para Padrões</button>
+    </form>
+    
+    <form action="/full_reset" method="POST">
+        <button style="background-color:#000000; margin-top: 5px;" type="submit">RESET TOTAL (Limpar Tudo)</button>
+    </form>
+
+</div>
+</body>
+</html>
